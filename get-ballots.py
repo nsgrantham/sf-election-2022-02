@@ -33,7 +33,6 @@ def parse_ballots(dir_):
     contests = read_manifest(os.path.join(dir_, "ContestManifest.json"))
     districts = read_manifest(os.path.join(dir_, "DistrictManifest.json"))
     candidates = read_manifest(os.path.join(dir_, "CandidateManifest.json"))
-    tabulators = read_manifest(os.path.join(dir_, "TabulatorManifest.json"))
     ballot_types = read_manifest(os.path.join(dir_, "BallotTypeManifest.json"))
     counting_groups = read_manifest(os.path.join(dir_, "CountingGroupManifest.json"))
     precinct_portions = read_manifest(os.path.join(dir_, "PrecinctPortionManifest.json"))
@@ -57,7 +56,6 @@ def parse_ballots(dir_):
                 original = session["Original"]
                 card = original["Cards"][0]  # should only ever be one "card" per ballot
                 ballot = {
-                    "tabulator": tabulators[session["TabulatorId"]],
                     "voting_location": voting_locations[session["TabulatorId"]],
                     "counting_group": counting_groups[session["CountingGroupId"]],
                     "precinct_portion": precinct_portions[original["PrecinctPortionId"]],
@@ -72,7 +70,7 @@ def parse_ballots(dir_):
                     if contest["Overvotes"]:
                         continue  # skip contests where a voter voted more than once
                     if marks:
-                        mark = marks[0]  # only one mark per contest because no ranked choice voting this election
+                        mark = marks[0]  # at most one mark per contest because no ranked choice voting with >1 candidates this election
                         if mark["IsVote"]:
                             ballot[contest_key] = candidates[mark["CandidateId"]]
 
@@ -82,12 +80,9 @@ def parse_ballots(dir_):
 
 
 if __name__ == "__main__":
-    # # Download from the following url and save as "data".
-    # # Unfortunately I get a 403 forbidden error when trying
-    # # to download the zipfile with python. Instead, visit the
-    # # url, download it, unzip it, and move the folder to your
-    # # working directory.
+    # # I get a 403 forbidden error when trying to download the zipfile via python.
+    # # Instead, download the zipfile, unzip it, and move the folder to your working directory.
     # download_and_unzip("https://www.sfelections.org/results/20220215/data/20220215_3/CVR_Export_20220215223514.zip", "data")
     ballots = parse_ballots("data")
-    ballots = sorted(ballots, key=len, reverse=True)
+    ballots = sorted(ballots, key=len, reverse=True)  # ensure the first ballot has all fieldnames for csv header
     write_csv(ballots, "ballots.csv")

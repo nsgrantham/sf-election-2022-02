@@ -31,21 +31,26 @@ plot_recall <- function(
         guides(fill = "none") +
         lims(x = c(-13000, 19000)) +
         labs(
-            title = glue::glue(
+            title = glue::glue("Recall <b>{boe_member}</b>? "),
+            subtitle = glue::glue(
                 "<span style='color:{no_color}'>No</span> or ",
-                "<span style='color:{yes_color}'>Yes</span> on ",
-                "Recall Measure Regarding <b>{boe_member}</b>"
+                "<span style='color:{yes_color}'>Yes</span> " ,
+                "by choice for State Assembly Member District 17"
             ),
             y = NULL,
             x = NULL
         ) +
         theme_minimal(base_size = 18) +
         theme(
-            plot.title = element_markdown(),
+            plot.title = element_markdown(size = 24),
             plot.title.position = "plot",
+            plot.subtitle = element_markdown(size = 16),
+            plot.background = element_rect(fill = "white", color = "white"),
+            plot.margin = margin(1.5, 1.5, 1, 1.5, unit = "line"),
             panel.grid.major.y = element_blank(),
             panel.grid.major.x = element_blank(),
             panel.grid.minor.x = element_blank(),
+            axis.text.y = element_text(size = 18),
             axis.text.x = element_blank()
         )
 }
@@ -54,12 +59,18 @@ ballots %>%
     rename(recall = recall_measure_regarding_alison_collins) %>%
     plot_recall("Alison Collins")
 
+ggsave("collins.png", width = 7, height = 4)
+
 ballots %>%
     rename(recall = recall_measure_regarding_gabriela_lópez) %>%
     plot_recall("Gabriela López")
 
+ggsave("lopez.png", width = 7, height = 4)
+
 ballots %>%
     rename(recall = recall_measure_regarding_faauuga_moliga) %>%
     plot_recall("Faauuga Moliga")
+
+ggsave("moliga.png", width = 7, height = 4)
 
 
